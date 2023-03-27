@@ -1,8 +1,8 @@
 import numpy
 import pandas
-import torch.utils.data as Dataset
+import torch.utils.data as data
 
-class MarsDataset(Dataset):
+class MarsDataset(data.Dataset):
 
 
     def __init__(self, csv_file, root_dir, transform=None):
