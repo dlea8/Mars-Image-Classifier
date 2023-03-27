@@ -1,6 +1,8 @@
-import numpy
-import pandas
+import numpy as np
+import pandas as pd
 import torch.utils.data as data
+import torch
+import os 
 
 class MarsDataset(data.Dataset):
 
