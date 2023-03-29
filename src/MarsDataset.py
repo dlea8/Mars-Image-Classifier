@@ -3,6 +3,7 @@ import pandas as pd
 import torch.utils.data as data
 import torch
 import os 
+import io
 
 class MarsDataset(data.Dataset):
 
