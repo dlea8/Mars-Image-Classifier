@@ -3,7 +3,9 @@ import pandas as pd
 import torch.utils.data as data
 import torch
 import os 
-import io
+import skimage.io as io
+from torchvision.io import read_image
+
 
 class MarsDataset(data.Dataset):
 
@@ -26,16 +28,11 @@ class MarsDataset(data.Dataset):
 
 
     def __getitem__(self, idx):
-        if torch.is_tensor(idx):
-            idx = idx.tolist()
-
-        img_name = os.path.join(self.root_dir,
-                                self.landmarks_frame.iloc[idx, 0])
-        image = io.imread(img_name)
-        landmarks = self.landmarks_frame.iloc[idx, 1:]
-        landmarks = np.array([landmarks])
-        landmarks = landmarks.astype('float').reshape(-1, 2)
-        sample = {'image': image, 'landmarks': landmarks}
-
+        img_path = os.path.join(self.root_dir, self.landmarks_frame.iloc[idx, 0])
+        image = read_image(img_path)
+        label = self.landmarks_frame.iloc[idx, 1]
         if self.transform:
-            sample = self.transform(sample)
+            image = self.transform(image)
+        if self.transform:
+            label = self.transform(label)
+        return image, label

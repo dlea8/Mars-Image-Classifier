@@ -7,6 +7,8 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
 
+from MarsDataset import MarsDataset
+
 
 class Net(nn.Module):
     def __init__(self):
@@ -119,16 +121,18 @@ def main():
         train_kwargs.update(cuda_kwargs)
         test_kwargs.update(cuda_kwargs)
 
-    transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
-        ])
-    dataset1 = datasets.MNIST('../data', train=True, download=True,
-                       transform=transform)
-    dataset2 = datasets.MNIST('../data', train=False,
-                       transform=transform)
-    train_loader = torch.utils.data.DataLoader(dataset1,**train_kwargs)
-    test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs)
+    mars_dataset = MarsDataset("/Users/blakebollinger/Library/Mobile Documents/com~apple~CloudDocs/LSU/Spring 2023/Math 4997/Group Project/Mars-Image-Classifier/mars-dataset/image-labels.csv", "/Users/blakebollinger/Library/Mobile Documents/com~apple~CloudDocs/LSU/Spring 2023/Math 4997/Group Project/Mars-Image-Classifier/mars-dataset/images")
+
+    # transform=transforms.Compose([
+    #     transforms.ToTensor(),
+    #     transforms.Normalize((0.1307,), (0.3081,))
+    #     ])
+    # dataset1 = datasets.MNIST('../data', train=True, download=True,
+    #                    transform=transform)
+    # dataset2 = datasets.MNIST('../data', train=False,
+    #                    transform=transform)
+    train_loader = torch.utils.data.DataLoader(mars_dataset,**train_kwargs)
+    test_loader = torch.utils.data.DataLoader(mars_dataset, **test_kwargs)
 
     model = Net().to(device)
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
