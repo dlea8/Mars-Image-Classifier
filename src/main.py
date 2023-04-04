@@ -121,7 +121,11 @@ def main():
         train_kwargs.update(cuda_kwargs)
         test_kwargs.update(cuda_kwargs)
 
-    mars_dataset = MarsDataset("./mars-dataset/image-labels.csv", "./mars-dataset/images")
+    # mars_dataset = MarsDataset("/Users/blakebollinger/Library/Mobile Documents/com~apple~CloudDocs/LSU/Spring 2023/Math 4997/Group Project/Mars-Image-Classifier/mars-dataset/image-labels.csv", "/Users/blakebollinger/Library/Mobile Documents/com~apple~CloudDocs/LSU/Spring 2023/Math 4997/Group Project/Mars-Image-Classifier/mars-dataset/images")
+
+    transform = transforms.Compose([transforms.ToTensor()])
+
+    mars_dataset = datasets.ImageFolder('./mars-dataset/images', transform=transform)
 
     # transform=transforms.Compose([
     #     transforms.ToTensor(),
