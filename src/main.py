@@ -18,8 +18,8 @@ class Net(nn.Module):
             nn.Linear(154587, 512),
             nn.ReLU(),
             nn.Linear(512, 512),
-            nn.ReLU(),
-            nn.Linear(512, 10),
+            # nn.ReLU(),
+            nn.Linear(512, 6),
         )
 
     def forward(self, x):
@@ -117,7 +117,7 @@ def main():
 
     transform = transforms.Compose([transforms.ToTensor()])
 
-    mars_dataset = datasets.ImageFolder('./mars-dataset/images', transform=transform)
+    mars_dataset = datasets.ImageFolder('../mars-dataset/images', transform=transform)
 
     # transform=transforms.Compose([
     #     transforms.ToTensor(),
