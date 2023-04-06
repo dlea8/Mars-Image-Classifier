@@ -15,11 +15,11 @@ class Net(nn.Module):
         super(Net, self).__init__()
         self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(154587, 309174),
+            nn.Linear(154587, 227),
             nn.ReLU(),
-            nn.Linear(309174, 309174),
+            nn.Linear(227, 227*2),
             nn.ReLU(),
-            nn.Linear(309174, 6)
+            nn.Linear(454, 6)
         )
 
     def forward(self, x):
