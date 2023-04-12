@@ -14,6 +14,9 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         self.flatten = nn.Flatten()
+        self.lin1 = nn.Linear(154587, 227)
+        self.lin2 = nn.Linear(227, 227*2)
+        self.lin3 = nn.Linear(454, 6)
         self.linear_relu_stack = nn.Sequential(
             nn.Linear(154587, 227),
             nn.ReLU(),
@@ -24,8 +27,14 @@ class Net(nn.Module):
 
     def forward(self, x):
         x = self.flatten(x)
-        logits = self.linear_relu_stack(x)
-        return logits
+        x = self.lin1(x)
+        x = F.relu(x)
+        x = self.lin2(x)
+        x = F.relu(x)
+        x = self.lin3(x)
+        output = F.log_softmax(x, dim=1)
+        # logits = self.linear_relu_stack(x)
+        return output
 
 
 def train(args, model, device, train_loader, optimizer, epoch):
@@ -95,12 +104,12 @@ def main():
 
     torch.manual_seed(args.seed)
 
-    if use_cuda:
-        device = torch.device("cuda")
-    elif use_mps:
-        device = torch.device("mps")
-    else:
-        device = torch.device("cpu")
+    # if use_cuda:
+    #     device = torch.device("cuda")
+    # elif use_mps:
+    #     device = torch.device("mps")
+    # else:
+    device = torch.device("cpu")
 
     print("Using device: ", device)
 
