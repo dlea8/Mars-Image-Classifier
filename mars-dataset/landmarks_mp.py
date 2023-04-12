@@ -4,10 +4,8 @@
 
 class_map = {0: 'other',
              1: 'crater',
-             2: 'dark_dune',
-             3: 'streak',
-             4: 'bright_dune',
-             5: 'edge'}
+             2: 'dune',
+             3: 'edge'}
 
 # reverse_class_map needs to be consistent with class_map
 reverse_class_map = {v: k for k,v in class_map.items()}
