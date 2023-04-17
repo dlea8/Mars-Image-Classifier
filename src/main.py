@@ -13,11 +13,11 @@ from MarsDataset import MarsDataset
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 6, 3, 1)
-        self.conv2 = nn.Conv2d(6, 12, 3, 1)
+        self.conv1 = nn.Conv2d(3, 32, 3, 1)
+        self.conv2 = nn.Conv2d(32, 64, 3, 1)
         self.dropout1 = nn.Dropout(0.25)
         self.dropout2 = nn.Dropout(0.5)
-        self.fc1 = nn.Linear(147852, 128)
+        self.fc1 = nn.Linear(788544, 128)
         self.fc2 = nn.Linear(128, 10)
 
 
@@ -105,12 +105,12 @@ def main():
 
     torch.manual_seed(args.seed)
 
-    # if use_cuda:
-    #     device = torch.device("cuda")
-    # elif use_mps:
-    #     device = torch.device("mps")
-    # else:
-    device = torch.device("cpu")
+    if use_cuda:
+        device = torch.device("cuda")
+    elif use_mps:
+        device = torch.device("mps")
+    else:
+        device = torch.device("cpu")
 
     print("Using device: ", device)
 
@@ -149,8 +149,8 @@ def main():
         test(model, device, test_loader)
         scheduler.step()
 
-    if args.save_model:
-        torch.save(model.state_dict(), "mnist_cnn.pt")
+
+    torch.save(model.state_dict(), "mnist_cnn.pt")
 
 
 if __name__ == '__main__':
