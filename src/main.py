@@ -105,12 +105,12 @@ def main():
 
     torch.manual_seed(args.seed)
 
-    if use_cuda:
-        device = torch.device("cuda")
-    elif use_mps:
-        device = torch.device("mps")
-    else:
-        device = torch.device("cpu")
+    # if use_cuda:
+    #     device = torch.device("cuda")
+    # elif use_mps:
+    #     device = torch.device("mps")
+    # else:
+    device = torch.device("cpu")
 
     print("Using device: ", device)
 
@@ -149,8 +149,8 @@ def main():
         test(model, device, test_loader)
         scheduler.step()
 
-
-    torch.save(model.state_dict(), "mnist_cnn.pt")
+    if args.save_model:
+        torch.save(model.state_dict(), "mnist_cnn.pt")
 
 
 if __name__ == '__main__':
