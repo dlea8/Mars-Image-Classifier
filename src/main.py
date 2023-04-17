@@ -14,23 +14,25 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         self.flatten = nn.Flatten()
-        self.lin1 = nn.Linear(154587, 227)
-        self.lin2 = nn.Linear(227, 227*2)
-        self.lin3 = nn.Linear(454, 6)
-        self.linear_relu_stack = nn.Sequential(
-            nn.Linear(154587, 227),
-            nn.ReLU(),
-            nn.Linear(227, 227*2),
-            nn.ReLU(),
-            nn.Linear(454, 6)
-        )
+        self.lin1 = nn.Linear(38307, 454)
+        self.lin2 = nn.Linear(454, 227)
+        self.lin3 = nn.Linear(227, 6)
+        self.dropout1 = nn.Dropout(0.25)
+        self.dropout2 = nn.Dropout(0.5)
+        self.dropout3 = nn.Dropout(0.75)
 
     def forward(self, x):
-        x = self.flatten(x)
+        #print(torch.flatten(x,1).shape)
+        x = F.max_pool2d(x, 2)
+        x = self.dropout1(x)
+        x = torch.flatten(x, 1)
+        #print(torch.flatten(x,1).shape)
         x = self.lin1(x)
         x = F.relu(x)
+        x = self.dropout2(x)
         x = self.lin2(x)
         x = F.relu(x)
+        x = self.dropout3(x)
         x = self.lin3(x)
         output = F.log_softmax(x, dim=1)
         # logits = self.linear_relu_stack(x)
