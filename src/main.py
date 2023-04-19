@@ -13,12 +13,12 @@ from MarsDataset import MarsDataset
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 32, 3, 1)
-        self.conv2 = nn.Conv2d(32, 64, 3, 1)
+        self.conv1 = nn.Conv2d(3, 3, 3, 1)
+        self.conv2 = nn.Conv2d(3, 1, 3, 1)
         self.dropout1 = nn.Dropout(0.25)
         self.dropout2 = nn.Dropout(0.5)
-        self.fc1 = nn.Linear(788544, 128)
-        self.fc2 = nn.Linear(128, 10)
+        self.fc1 = nn.Linear(12321, 512)
+        self.fc2 = nn.Linear(512, 4)
 
 
     def forward(self, x):
