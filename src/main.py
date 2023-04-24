@@ -6,6 +6,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
+import matplotlib.pyplot as plt
 
 from MarsDataset import MarsDataset
 
@@ -40,6 +41,9 @@ class Net(nn.Module):
 
 def train(args, model, device, train_loader, optimizer, epoch):
     model.train()
+    loss_values = []
+    running_loss = 0.0
+
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
@@ -53,6 +57,24 @@ def train(args, model, device, train_loader, optimizer, epoch):
                 100. * batch_idx / len(train_loader), loss.item()))
             if args.dry_run:
                 break
+            running_loss =+ loss.item()
+            # print(loss.item())
+        loss_values.append(running_loss)
+
+    return loss_values
+
+    
+    # plt.plot(train_losses,'-o')
+    # plt.plot(eval_losses,'-o')
+    # plt.xlabel('epoch')
+    # plt.ylabel('losses')
+    # plt.legend(['Train','Valid'])
+    # plt.title('Train vs Valid Losses')
+    
+    # plt.show()
+
+    # loss.item()
+    # batch_idx * len(data)
 
 
 def test(model, device, test_loader):
@@ -105,12 +127,12 @@ def main():
 
     torch.manual_seed(args.seed)
 
-    if use_cuda:
-        device = torch.device("cuda")
-    elif use_mps:
-        device = torch.device("mps")
-    else:
-        device = torch.device("cpu")
+    # if use_cuda:
+    #     device = torch.device("cuda")
+    # elif use_mps:
+    #     device = torch.device("mps")
+    # else:
+    device = torch.device("cpu")
 
     print("Using device: ", device)
 
@@ -143,11 +165,17 @@ def main():
     model = Net().to(device)
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 
+    loss_values = []
     scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
-    for epoch in range(1, 25 + 1):
-        train(args, model, device, train_loader, optimizer, epoch)
+    for epoch in range(1, 5):
+        loss_values += train(args, model, device, train_loader, optimizer, epoch)
         test(model, device, test_loader)
         scheduler.step()
+
+    plt.xlabel('epoch')
+    plt.ylabel('losses')
+    plt.plot(loss_values)
+    plt.show()
 
 
     torch.save(model.state_dict(), "mnist_cnn.pt")
