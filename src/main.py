@@ -95,6 +95,8 @@ def test(model, device, test_loader):
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
 
+    return 100. * correct/len(test_loader.dataset)
+
 
 def main():
     # Training settings
@@ -127,12 +129,12 @@ def main():
 
     torch.manual_seed(args.seed)
 
-    # if use_cuda:
-    #     device = torch.device("cuda")
-    # elif use_mps:
-    #     device = torch.device("mps")
-    # else:
-    device = torch.device("cpu")
+    if use_cuda:
+        device = torch.device("cuda")
+    elif use_mps:
+        device = torch.device("mps")
+    else:
+        device = torch.device("cpu")
 
     print("Using device: ", device)
 
@@ -166,15 +168,24 @@ def main():
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 
     loss_values = []
+    accuracy_values = []
     scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
-    for epoch in range(1, 5):
+    for epoch in range(1, 10):
         loss_values += train(args, model, device, train_loader, optimizer, epoch)
-        test(model, device, test_loader)
+        accuracy_values.append(test(model, device, test_loader))
         scheduler.step()
 
     plt.xlabel('epoch')
     plt.ylabel('losses')
     plt.plot(loss_values)
+    # plt.xlim(-10, 10)
+    # plt.ylim(-1, 1)
+    plt.show()
+
+    plt.xlabel('epoch')
+    plt.ylabel('percent accuracy')
+    plt.plot(accuracy_values)
+    plt.ylim(0, 100)
     plt.show()
 
 
