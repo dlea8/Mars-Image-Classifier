@@ -14,35 +14,46 @@ from MarsDataset import MarsDataset
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 3, 3, 1)
-        self.conv2 = nn.Conv2d(3, 1, 3, 1)
+        self.flatten = nn.Flatten()
+        self.lin1 = nn.Linear(38307, 454)
+        self.lin4 = nn.Linear(454, 454)
+        self.lin5 = nn.Linear(454, 454)
+        self.lin2 = nn.Linear(454, 227)
+        self.lin3 = nn.Linear(227, 6)
         self.dropout1 = nn.Dropout(0.25)
         self.dropout2 = nn.Dropout(0.5)
-        self.fc1 = nn.Linear(12321, 512)
-        self.fc2 = nn.Linear(512, 4)
-
+        self.dropout3 = nn.Dropout(0.75)
 
     def forward(self, x):
-        x = self.conv1(x)
-        x = F.relu(x)
-        x = self.conv2(x)
-        x = F.relu(x)
+        #print(torch.flatten(x,1).shape)
         x = F.max_pool2d(x, 2)
         x = self.dropout1(x)
         x = torch.flatten(x, 1)
-        #print(x.shape)
-        x = self.fc1(x)
+        #print(torch.flatten(x,1).shape)
+        x = self.lin1(x)
         x = F.relu(x)
         x = self.dropout2(x)
-        x = self.fc2(x)
+        x = self.lin4(x)
+        x = F.relu(x)
+        x = self.dropout2(x)
+        x = self.lin5(x)
+        x = F.relu(x)
+        x = self.dropout2(x)
+        x = self.lin2(x)
+        x = F.relu(x)
+        x = self.dropout3(x)
+        x = self.lin3(x)
         output = F.log_softmax(x, dim=1)
+        # logits = self.linear_relu_stack(x)
         return output
 
 
 def train(args, model, device, train_loader, optimizer, epoch):
     model.train()
-    loss_values = []
+    # loss_values = []
     running_loss = 0.0
+    running_accuracy = 0.0
+    correct = 0
 
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
@@ -51,6 +62,10 @@ def train(args, model, device, train_loader, optimizer, epoch):
         loss = F.nll_loss(output, target)
         loss.backward()
         optimizer.step()
+
+        pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+        correct += pred.eq(target.view_as(pred)).sum().item()
+
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
@@ -58,24 +73,9 @@ def train(args, model, device, train_loader, optimizer, epoch):
             if args.dry_run:
                 break
             running_loss =+ loss.item()
-            # print(loss.item())
-    
-    loss_values.append(running_loss)
+            # running_accuracy =+ 100. * batch_idx / len(train_loader)
 
-    return loss_values
-
-    
-    # plt.plot(train_losses,'-o')
-    # plt.plot(eval_losses,'-o')
-    # plt.xlabel('epoch')
-    # plt.ylabel('losses')
-    # plt.legend(['Train','Valid'])
-    # plt.title('Train vs Valid Losses')
-    
-    # plt.show()
-
-    # loss.item()
-    # batch_idx * len(data)
+    return [100. * correct/len(train_loader.dataset), running_loss]
 
 
 def test(model, device, test_loader):
@@ -96,7 +96,7 @@ def test(model, device, test_loader):
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
 
-    return 100. * correct/len(test_loader.dataset)
+    return [100. * correct/len(test_loader.dataset), test_loss]
 
 
 def main():
@@ -168,26 +168,57 @@ def main():
     model = Net().to(device)
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 
-    loss_values = []
-    accuracy_values = []
+    training_loss_values = []
+    training_accuracy_values = []
+    test_accuracy_values = []
+    test_loss_values = []
+
     scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
-    for epoch in range(1, 10):
-        loss_values += train(args, model, device, train_loader, optimizer, epoch)
-        accuracy_values.append(test(model, device, test_loader))
+    for epoch in range(1, 8):
+        test_returns = test(model, device, test_loader)
+        train_returns = train(args, model, device, train_loader, optimizer, epoch)
+
+        training_accuracy_values.append(train_returns[0])
+        training_loss_values.append(train_returns[1])
+
+        test_accuracy_values.append(test_returns[0])
+        test_loss_values.append(test_returns[1])
         scheduler.step()
 
+
+    #  trianing graphs'
+    plt.title("Training Set Loss")
     plt.xlabel('epoch')
     plt.ylabel('losses')
-    plt.plot(loss_values)
-    # plt.xlim(-10, 10)
-    # plt.ylim(-1, 1)
+    plt.plot(training_loss_values)
     plt.show()
 
+    plt.title("Training Set Accuracy")
     plt.xlabel('epoch')
     plt.ylabel('percent accuracy')
-    plt.plot(accuracy_values)
+    plt.plot(training_accuracy_values)
     plt.ylim(0, 100)
     plt.show()
+
+
+
+    # testing graphs
+    plt.title("Test Set Accuracy")
+    plt.xlabel('epoch')
+    plt.ylabel('percent accuracy')
+    plt.plot(test_accuracy_values)
+    plt.ylim(0, 100)
+    plt.show()
+
+
+    plt.title("Test Set Loss")
+    plt.xlabel('epoch')
+    plt.ylabel('losses')
+    plt.plot(test_loss_values)
+    plt.show()
+
+
+
 
 
     torch.save(model.state_dict(), "mnist_cnn.pt")
