@@ -59,7 +59,8 @@ def train(args, model, device, train_loader, optimizer, epoch):
                 break
             running_loss =+ loss.item()
             # print(loss.item())
-        loss_values.append(running_loss)
+    
+    loss_values.append(running_loss)
 
     return loss_values
 
