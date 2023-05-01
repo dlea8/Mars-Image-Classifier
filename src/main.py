@@ -15,9 +15,9 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         self.flatten = nn.Flatten()
-        self.lin1 = nn.Linear(38307, 454)
-        self.lin4 = nn.Linear(454, 454)
-        self.lin5 = nn.Linear(454, 454)
+        self.lin1 = nn.Linear(38307, 1000)
+        self.lin4 = nn.Linear(1000, 800)
+        self.lin5 = nn.Linear(800, 454)
         self.lin2 = nn.Linear(454, 227)
         self.lin3 = nn.Linear(227, 6)
         self.dropout1 = nn.Dropout(0.25)
