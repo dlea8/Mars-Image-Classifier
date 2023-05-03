@@ -14,39 +14,23 @@ from MarsDataset import MarsDataset
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.flatten = nn.Flatten()
-        self.lin1 = nn.Linear(38307, 1000)
-        self.lin4 = nn.Linear(1000, 800)
-        self.lin5 = nn.Linear(800, 454)
-        self.lin2 = nn.Linear(454, 227)
-        self.lin3 = nn.Linear(227, 6)
-        self.dropout1 = nn.Dropout(0.25)
-        self.dropout2 = nn.Dropout(0.5)
-        self.dropout3 = nn.Dropout(0.75)
+        self.conv1 = nn.Conv2d(3, 3, 3, 1)
+        self.conv2 = nn.Conv2d(3, 1, 3, 1)
+        self.fc1 = nn.Linear(12321, 512)
+        self.fc2 = nn.Linear(512, 4)
 
     def forward(self, x):
-        #print(torch.flatten(x,1).shape)
+        x = self.conv1(x)
+        x = F.relu(x)
+        x = self.conv2(x)
+        x = F.relu(x)
         x = F.max_pool2d(x, 2)
-        x = self.dropout1(x)
         x = torch.flatten(x, 1)
-        #print(torch.flatten(x,1).shape)
-        x = self.lin1(x)
+        x = self.fc1(x)
         x = F.relu(x)
-        x = self.dropout2(x)
-        x = self.lin4(x)
-        x = F.relu(x)
-        x = self.dropout2(x)
-        x = self.lin5(x)
-        x = F.relu(x)
-        x = self.dropout2(x)
-        x = self.lin2(x)
-        x = F.relu(x)
-        x = self.dropout3(x)
-        x = self.lin3(x)
+        x = self.fc2(x)
         output = F.log_softmax(x, dim=1)
-        # logits = self.linear_relu_stack(x)
         return output
-
 
 def train(args, model, device, train_loader, optimizer, epoch):
     model.train()
@@ -174,7 +158,7 @@ def main():
     test_loss_values = []
 
     scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
-    for epoch in range(1, 8):
+    for epoch in range(1, 15):
         test_returns = test(model, device, test_loader)
         train_returns = train(args, model, device, train_loader, optimizer, epoch)
 
