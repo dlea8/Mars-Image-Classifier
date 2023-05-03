@@ -1,5 +1,6 @@
 from __future__ import print_function
 import argparse
+from cProfile import label
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -171,35 +172,39 @@ def main():
 
 
     #  trianing graphs'
-    plt.title("Training Set Loss")
-    plt.xlabel('epoch')
-    plt.ylabel('losses')
-    plt.plot(training_loss_values)
+    plt.title("Loss")
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.plot(training_loss_values, label='Train Loss')
+    plt.plot(test_loss_values, label='test Loss')
+    plt.legend()
     plt.show()
 
-    plt.title("Training Set Accuracy")
-    plt.xlabel('epoch')
-    plt.ylabel('percent accuracy')
-    plt.plot(training_accuracy_values)
+    plt.title("Accuracy")
+    plt.xlabel('Epoch')
+    plt.ylabel('Percent Accuracy')
+    plt.plot(training_accuracy_values, label='Train Accuracy')
+    plt.plot(test_accuracy_values, label='Test Accuracy')
     plt.ylim(0, 100)
+    plt.legend()
     plt.show()
 
 
 
     # testing graphs
-    plt.title("Test Set Accuracy")
-    plt.xlabel('epoch')
-    plt.ylabel('percent accuracy')
-    plt.plot(test_accuracy_values)
-    plt.ylim(0, 100)
-    plt.show()
+    # plt.title("Test Set Accuracy")
+    # plt.xlabel('epoch')
+    # plt.ylabel('percent accuracy')
+    # plt.plot(test_accuracy_values)
+    # plt.ylim(0, 100)
+    # plt.show()
 
 
-    plt.title("Test Set Loss")
-    plt.xlabel('epoch')
-    plt.ylabel('losses')
-    plt.plot(test_loss_values)
-    plt.show()
+    # plt.title("Test Set Loss")
+    # plt.xlabel('epoch')
+    # plt.ylabel('losses')
+    # plt.plot(test_loss_values)
+    # plt.show()
 
 
 
